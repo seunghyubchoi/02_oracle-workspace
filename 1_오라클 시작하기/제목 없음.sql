@@ -1,0 +1,1 @@
+CREATE USER kh IDENTIFIED By kh;
