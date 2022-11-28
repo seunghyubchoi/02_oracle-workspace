@@ -259,5 +259,345 @@
 */
     SELECT ROUND(123.456) FROM DUAL;
     
+    SELECT ROUND(123.456, 1) FROM DUAL;
     
+    SELECT ROUND(123.456, 5) FROM DUAL; -- 위치보다 큰 수 입력시 그대로 나옴
+    
+    SELECT ROUND(123.456, -1) FROM DUAL;
+    
+    SELECT ROUND(123.456, -2) FROM DUAL;
+
 ---------------------------------------------------------------------------------------
+
+/*
+    < CEIL >
+    올림처리 해주는 함수
+    
+    CEIL(NUMBER)
+    
+*/
+    SELECT CEIL(123.152) FROM DUAL; -- 반올림이 아닌 무조건 올림, 위치지정 불가
+
+---------------------------------------------------------------------------------------
+/*
+    < FLOOR >
+    소수점 아래 버림처리 해주는 함수
+    <=> CEIL과 반대
+    
+    FLOOR(NUMBER)
+    
+*/
+    SELECT FLOOR(123.152) FROM DUAL; -- 위치지정불가
+    SELECT FLOOR(123.952) FROM DUAL;
+
+---------------------------------------------------------------------------------------
+
+/*
+    TRUNC(절삭하다)
+    = 위치 지정 가능한 버림처리 해주는 함수
+    
+    TRUNC(NUMBER, [위치])
+
+*/
+
+    SELECT TRUNC(123.456) FROM DUAL; -- 위치 지정 안하면 FLOOR랑 동일
+    SELECT TRUNC(123.456, 1) FROM DUAL; -- 소수점 1번째 자리까지 나오고 나머지 버림
+    SELECT TRUNC(123.456, -1) FROM DUAL; -- 해당 위치 뒤로 버림
+
+---------------------------------------------------------------------------------------
+    
+    /*
+    
+    <날짜 처리 함수>
+    
+    */
+    
+-- SYSDATE : SYSTEM에 있는 날짜 및 시간 반환
+--           현재 날짜 및 시간
+
+    SELECT SYSDATE FROM DUAL; -- 클릭해서 확인해보면 시간도 확인 가능
+    
+    -- MONTHS_BETWEEN  (DATE1, DATE2)
+    -- : 두 날짜 사이의 개월 수 => 내부적으로 (DATE1-DATE2) 후, 나누기 30, 31 진행
+    -- => 결과 값은 NUMBER 타입!!
+    
+    -- 사원명, 근무일수, 근무개월수
+    SELECT EMP_NAME, FLOOR(SYSDATE - HIRE_DATE) || '일' AS "근무일수"
+    , CEIL(MONTHS_BETWEEN(SYSDATE, HIRE_DATE)) || '개월' AS "근무개월수"
+    FROM EMPLOYEE;
+
+---------------------------------------------------------------------------------------   
+    /*
+        < ADD_MONTHS(DATE, NUMBER) >
+        : 특정 날짜에 해당 숫자만큼의 개월 수를 더해서 날짜를 리턴
+        : 결과값은 DATE 타입
+    */
+    
+    SELECT ADD_MONTHS(SYSDATE, 6) FROM DUAL;
+    
+-- EMPLOYEE에서 사원명, 입사일, 입사 후 6개월이 된 날짜
+
+    SELECT EMP_NAME AS "이름", HIRE_DATE AS "입사일", ADD_MONTHS(HIRE_DATE, 6) AS "6개월 후"
+    FROM EMPLOYEE;
+    
+    /*
+    
+    < NEXT_DAY(DATE, DAY(문자|숫자) >
+    : 특정 날짜 이후에 가까운 해당 요일의 날짜를 반환해주는 함수
+    : 결과값은 DATE 타입
+    
+    */
+    
+    SELECT SYSDATE, NEXT_DAY(SYSDATE, '금요일') FROM DUAL;
+    SELECT SYSDATE, NEXT_DAY(SYSDATE, '금') FROM DUAL;
+    SELECT SYSDATE, NEXT_DAY(SYSDATE, 1) FROM DUAL; -- 1은 일요일
+    SELECT SYSDATE, NEXT_DAY(SYSDATE, 7) FROM DUAL; -- 7은 토요일
+    SELECT SYSDATE, NEXT_DAY(SYSDATE, 6) FROM DUAL;
+    
+    SELECT SYSDATE, NEXT_DAY(SYSDATE, 'FRIDAY') FROM DUAL;
+
+    -- 언어 변경
+    SELECT *
+    FROM NLS_SESSION_PARAMETERS;
+    
+    ALTER SESSION SET NLS_LANGUAGE = KOREAN;
+    
+     /*
+    
+    < LAST_DAY(DATE) >
+    : 해당 월의 마지막 날짜를 구해서 반환
+    : 결과값은 DATE 타입
+    
+    */
+    
+    SELECT LAST_DAY(SYSDATE) FROM DUAL;
+    
+    
+    -- EMPLOYEE에서 사원명, 입사일, 입사한 달의 마지막 날, 근무 일수
+    SELECT EMP_NAME, HIRE_DATE, LAST_DAY(HIRE_DATE) AS "마지막 날", (LAST_DAY(HIRE_DATE) - HIRE_DATE) AS "근무일수"
+    FROM EMPLOYEE;
+    
+    /*
+    
+    < EXTRACT >
+    : 특정 날짜로 부터 년도|월|일 값을 추출해서 반환하는 함수
+    
+    EXTRACT(YEAR FROM DATE) : 년도만 추출
+    EXTRACT(MONTH FROM DATE) : 월만 추출
+    EXTRACT(DAY FROM DATE) : 일만 추출
+    
+    
+    */
+    
+    
+    SELECT EMP_NAME AS "이름", EXTRACT(YEAR FROM HIRE_DATE) || '년' AS "입사년도",
+    EXTRACT(MONTH FROM HIRE_DATE) || '월' AS "입사월", EXTRACT(DAY FROM HIRE_DATE) || '일' AS "입사일"
+    FROM EMPLOYEE
+    --ORDER BY "입사년도", "입사월", "입사일"  ASC;
+    ORDER BY 2;
+    
+    SELECT EMP_NAME, EMAIL, PHONE
+    FROM EMPLOYEE
+    ORDER BY PHONE DESC NULLS LAST;
+    
+    
+----------------------------------------------------------------------------
+/*
+    < 형변환 함수 >
+    1. TO_CHAR() : 숫자 타입 또는 날짜 타입의 값을 문자 타입으로 변환시켜주는 함수
+    
+    TO_CHAR(숫자|날짜, [포맷])
+    => 결과값 : CHARACTER 타입
+    
+*/
+
+    -- 숫자타입 => 문자타입
+    SELECT TO_CHAR(1234) FROM DUAL; -- '1234'로 바뀌어 있음
+    SELECT TO_CHAR(1234, '9999') FROM DUAL; -- 다섯칸짜리 공간 확보, 오른쪽 정렬, 빈칸 공백
+    SELECT TO_CHAR(1234, '00000') FROM DUAL; -- 다섯칸짜리 공간 확보, 빈칸 0으로 채움
+    SELECT TO_CHAR(1234, 'L99999') FROM DUAL; -- 현재 설정된 나라(LOCAL)의 화폐단위를 붙여서 출력
+    SELECT TO_CHAR(1234, '$99999') FROM DUAL; -- $
+    
+    SELECT TO_CHAR(1234, 'L99,999') FROM DUAL;
+
+    SELECT EMP_NAME, TO_CHAR(SALARY, 'L999,999,999')    
+    FROM EMPLOYEE;
+    
+    -- 날짜타입 => 문자타입
+    SELECT SYSDATE, TO_CHAR(SYSDATE) FROM DUAL;
+    -- DATE 타입이면 눌렀을 때 달력이 나와야 함
+
+    SELECT SYSDATE, TO_CHAR(SYSDATE, 'HH:MI:SS') FROM DUAL;
+    -- 시간 리턴, 12시간
+
+    SELECT SYSDATE, TO_CHAR(SYSDATE, 'HH24:MI:SS') FROM DUAL;
+    -- 다른 시간 표기 방법, 24시간
+
+    SELECT SYSDATE, TO_CHAR(SYSDATE, 'YYYY-MM-DD DAY') FROM DUAL;
+    SELECT SYSDATE, TO_CHAR(SYSDATE, 'YYYY-MM-DD DY') FROM DUAL;
+
+    SELECT SYSDATE, TO_CHAR(SYSDATE, 'MON, YYYY') FROM DUAL; -- 00월 0000년
+    
+    SELECT EMP_NAME, TO_CHAR(HIRE_DATE, 'YYYY-MM-DD')
+    FROM EMPLOYEE;
+    
+    -- EX) 1990년 02월 06일
+    SELECT EMP_NAME, TO_CHAR(HIRE_DATE, 'YYYY"년" MM"월" DD"일"')
+    FROM EMPLOYEE;
+    -- 없는 포맷 제시할 땐 ""로 묶기
+    
+    -- 년도와 관련된 포맷
+    SELECT TO_CHAR(SYSDATE, 'YYYY'), 
+    TO_CHAR(SYSDATE, 'YY'), 
+    TO_CHAR(SYSDATE, 'RRRR'), 
+    TO_CHAR(SYSDATE, 'RR'),
+    TO_CHAR(SYSDATE, 'YEAR')
+    FROM DUAL;
+    
+    -- 월과 관련된 포맷
+    SELECT TO_CHAR(SYSDATE, 'MM'),
+    TO_CHAR(SYSDATE, 'MON'),
+    TO_CHAR(SYSDATE, 'MONTH'),
+    TO_CHAR(SYSDATE, 'RM')
+    FROM DUAL;
+    
+    -- 일과 관련된 포맷
+    SELECT TO_CHAR(SYSDATE, 'DDD'), -- 365일 중에 오늘은 며칠 째?
+    TO_CHAR(SYSDATE, 'DD'), -- 월 기준으로 오늘이 며칠 째 인지
+    TO_CHAR(SYSDATE, 'D') -- 주 기준으로 며칠 째 인지
+    FROM DUAL;
+     
+     -- 요일과 관련된 포맷
+     SELECT TO_CHAR(SYSDATE, 'DAY'),
+     TO_CHAR(SYSDATE, 'DY')
+     FROM DUAL;
+     
+------------------------------------------------------------------------------
+
+/*
+    < TO_DATE >
+    숫자 타입 또는 문자 타입 데이터를 날짜 타입으로 변환시켜주는 함수
+    
+    TO_DATE(숫자|문자, [포맷])
+    
+    결과값 : DATE 타입
+*/
+
+    SELECT TO_DATE(20100101) FROM DUAL;
+    SELECT TO_DATE(100101)FROM DUAL;
+    SELECT TO_DATE('070101')FROM DUAL;
+    -- 앞자리가 0이면 홑따옴표로 감싸주자
+    -- SELECT TO_DATE('041030 143000')FROM DUAL; 에러 발생
+    SELECT TO_DATE('041030 143000', 'YYMMDD HH24MISS')FROM DUAL;
+    
+    SELECT TO_DATE('140630', 'YYMMDD') FROM DUAL; -- 2014년
+    SELECT TO_DATE('980630','YYMMDD') FROM DUAL; -- 2098년
+    -- => 무조건 현 세기로 반영
+    
+    -- 'YY' => 'RR'
+    SELECT TO_DATE('140630', 'RRMMDD') FROM DUAL; -- 2014년
+    -- RR(14)이 50보다 작아서 현 세기
+    SELECT TO_DATE('980630','RRMMDD') FROM DUAL; -- 1998년
+    -- RR(98)이 50보다 커서 이전 세기
+    
+------------------------------------------------------------------------------ 
+
+/*
+    < TO_NUMBER >
+    문자 타입의 데이터를 숫자 타입으로 변환시켜주는 함수
+    
+    TO_NUMBER(문자, [포맷]) => 결과값은 NUMBER 타입
+    
+*/
+
+    SELECT TO_NUMBER('05123475') FROM DUAL; -- 숫자타입은 앞에 0이 안 붙어서 날아간 것
+    SELECT '10000000' + '550000' FROM DUAL; -- 오라클에서는 자동 형변환이 잘 되어 있음
+    --SELECT '1,000,000' + '55,000' FROM DUAL; -- 안에 숫자만 있어야 자동 형변환
+    SELECT TO_NUMBER('1,000,000' , '9,999,999') + TO_NUMBER('55,000', '99,999') FROM DUAL;
+    
+------------------------------------------------------------------------------    
+    
+/*
+    < NULL 처리 함수 >
+    
+    중요**
+    
+*/
+    -- NVL(컬럼, 해당 컬럼값이 NULL일 경우의 반환 값)
+    SELECT EMP_NAME, BONUS, NVL(BONUS , 0)
+    FROM EMPLOYEE;
+    
+    -- 전체 사원의 이름, 보너스 포함 연봉
+    SELECT EMP_NAME, (SALARY + (SALARY * BONUS)) * 12 AS "보포연", (SALARY + SALARY * NVL(BONUS,0)) * 12 AS "보포연"
+    FROM EMPLOYEE;
+    
+    SELECT EMP_NAME, NVL(DEPT_CODE, '부서 없음') AS "부서"
+    FROM EMPLOYEE;
+    
+-- NVL2(컬럼, 반환값1, 반환값2)
+-- 컬럼값이 존재할 경우 반환값1 반환
+-- 컬럼값이 NULL일 경우 반환값2 반환
+    SELECT EMP_NAME, NVL2(DEPT_CODE, '부서 있음', '부서 없음')
+    FROM EMPLOYEE;
+    
+    
+-- 보너스가 있는 사람은 0.7 없는 사람은 0.1
+    SELECT EMP_NAME, NVL2(BONUS, 0.7, 0.1) AS "보누수"
+    FROM EMPLOYEE;
+    
+-- NULLIF(비교대상1, 비교대상2)
+-- 두 개의 값이 일치하면 NULL 반환
+-- 두 개의 값이 일치하지 않으면 비교대상1을 값을 반환
+
+    SELECT NULLIF('123', '123') FROM DUAL;
+    SELECT NULLIF('123', '456') FROM DUAL;
+
+------------------------------------------------------------------------------ 
+/*
+    < 선택 함수 >
+    DECODE(비교하고자 하는 대상(컬럼|산술연산|함수식), 비교값1, 결과값1, 비교값2, 결과값2, ...)
+    
+    SWITCH(비교대상) {
+    CASE 비교값1 : BREAK;
+    CASE 비교값2 : BREAK;
+    ...
+    DEFAULT : 
+
+*/
+
+-- 사번, 사원명, 주민번호
+SELECT 
+EMP_ID, EMP_NAME, EMP_NO, SUBSTR(EMP_NO, 8,1) AS "뒷번호" , 
+DECODE(SUBSTR(EMP_NO, 8,1), '1', '남자', '2', '여자') AS "성별"
+FROM EMPLOYEE;
+    
+-- 직원의 급여 조회시 각 직급별로 인상해서 조회
+-- J7인 사원 급여 10% 인상 (SALARY * 1.1) 
+-- J6인 사원 급여 15% 인상 (SALARY * 1.15)
+-- J5인 사원 급여 20% 인상 (SALARY * 1.2)
+-- 그외 사원 급여 5% 인상 (SALARY * 1.05)
+
+SELECT
+EMP_NAME, JOB_CODE, SALARY,
+DECODE(JOB_CODE, 
+'J7', SALARY * 1.1, 
+'J6', SALARY * 1.15, 
+'J5', SALARY * 1.2,
+SALARY * 1.05) AS "인상된 급여"
+FROM EMPLOYEE;
+
+------------------------------------------------------------------------------ 
+/*
+    < CASE WHEN THEN >
+    CASE WHEN 조건식1 THEN 결과값1
+         WHEN 조건식2 THEN 결과값2
+         ...
+         ELSE 결과값
+    END
+*/
+SELECT EMP_NAME, SALARY,
+    CASE WHEN SALARY >= 5000000 THEN '고급 개발자'
+         WHEN SALARY >= 3500000 THEN '중급 개발자'
+         ELSE '초급 개발자'
+    END AS "레벨"
+FROM EMPLOYEE;

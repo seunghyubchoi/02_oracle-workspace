@@ -34,25 +34,38 @@ AND EMAIL LIKE '____%' AND BONUS IS NULL;
 
 
 -- 문제점
---: JOB_CODE 'J6' 안나옴, SALARY 200000 이상 아님, 남자도 있음
---: EMAIL LIKE '____%'에 이스케이프 문자가 없음, BONUS가 NULL임
+-- 1. OR 연산자와 AND 연산자가 나열되어 있을 경우 AND 연산자 연산이 먼저 수행 됨
+--    : 문제에서 요구한 내용으로 OR 연산이 먼저 수행 되어야 함
+-- 2. 급여 값에 대신 비교가 잘 못 되어 있음, '>=' 으로 비교해야 함
+-- 3. BONUS가 있는 조건의 IS NULL 이 아닌 IS NOT NULL을 사용해야 함
+-- 4. 여자에 대한 조건이 누락되어 있음
+-- 5. EMAIL에 대한 비교시 네번째 자리에 있는 '_'를 데이터 값으로 취급하기 위해 
+--    새 와일드 카드 및 이스케이프로 등록
 
--- 1. 연산자 우선순위에 따라서 AND 연산자 먼저 수행 됨
--- 2. BONUS가 없는 데이터만 나오고 있음
--- 3. 여자가 아닌 데이터가 나오고 있음
--- 4. EMAIL 와일드카드 _가 탈출 못함, 데이터 값과 중복되어 이상한 결과 출력
--- 5. 월급이 2백만원이 안되는 애들 출력 / 2백만 초과로 출력
-
-
-
-
-
--- 정답 쿼리
---:
-SELECT EMP_NAME, EMP_NO, JOB_CODE, DEPT_CODE, SALARY, BONUS
+-- 정답쿼리
+SELECT EMP_NAME, EMP_NO, JOB_CODE, DEPT_CODE, SALARY, BONUS, EMAIL
 FROM EMPLOYEE
-WHERE (JOB_CODE = 'J7' OR JOB_CODE = 'J6')
-AND SALARY >= 2000000
-AND EMAIL LIKE '___$_%' ESCAPE '$' 
-AND BONUS IS NOT NULL 
-AND SUBSTR(EMP_NO, 8, 1) IN '2';
+WHERE (JOB_CODE = 'J7' OR JOB_CODE = 'J6') AND SALARY >= 2000000
+AND EMAIL LIKE '___$_%' ESCAPE '$' AND BONUS IS NOT NULL 
+AND SUBSTR(EMP_NO, 8,1) IN ('2', '4');
+
+
+
+--------------------------------------------------------------------------------
+-- QUIZ 3
+-- [계정생성구문] CREATE USER 계정명 IDENTIFIED BY 비밀번호
+-- 계정명 : SCOTT, 비밀번호 : TIGER 계정을 생성하고 싶다
+-- 이때, 일반사용자 계정인 KH 계정에 접속해서 CREATE USER SCOTT;
+-- 로 실행하니 문제 발생!!!
+
+-- 문제점 1. 관리자계정에서만 계정 만들 수 있음
+-- 문제점 2. SQL문이 잘 못 되어 있음, 비번까지 입력
+
+-- 조치내용 1. 관리자계정에 접속
+-- 조치내용 2. CREATE USER SCOTT IDENTIFIED BY TIGER;
+
+-- CREATE 후 테스트 실패 = SCOTT에 권한을 주지 않았기 때문
+
+-- 문제점 1. 사용자 계정 생성 후, 최소한의 권한 부여가 안 됨
+
+-- 조치내용 1. GRANT CONNECT, RESOURCE TO SCOTT;
