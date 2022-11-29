@@ -442,7 +442,7 @@
     FROM EMPLOYEE;
     
     -- EX) 1990년 02월 06일
-    SELECT EMP_NAME, TO_CHAR(HIRE_DATE, 'YYYY"년" MM"월" DD"일"')
+    SELECT EMP_NAME, HIRE_DATE, TO_CHAR(HIRE_DATE, 'YYYY"년" MM"월" DD"일"')
     FROM EMPLOYEE;
     -- 없는 포맷 제시할 땐 ""로 묶기
     
@@ -480,7 +480,7 @@
     
     TO_DATE(숫자|문자, [포맷])
     
-    결과값 : DATE 타입
+    결과값 : DATE 타
 */
 
     SELECT TO_DATE(20100101) FROM DUAL;
@@ -601,3 +601,80 @@ SELECT EMP_NAME, SALARY,
          ELSE '초급 개발자'
     END AS "레벨"
 FROM EMPLOYEE;
+------------------------------------------------------------------------------
+------------------------------ 그 룹 함 수 ------------------------------------
+
+-- 1. SUM(숫자타입컬럼)
+-- : 해당 컬럼 값들의 총 합계를 구해서 반환해주는 함수
+
+-- EMPLOYEE 테이블의 전 사원의 총 급여 합
+SELECT SUM(SALARY)
+FROM EMPLOYEE; -- 전체 사원이 한 그룹으로 묶임
+
+-- 남자 사원의 급여 합
+SELECT SUM(SALARY)
+FROM EMPLOYEE
+WHERE SUBSTR(EMP_NO, 8,1) = '1';
+-- 남자 사원들이 한 그룹으로 묶임
+
+-- 직접해보기
+-- 부서코드가 D5인 사원들의 총 연봉 합
+SELECT TO_CHAR(SUM(SALARY*12), 'L999,999,999') AS "연봉의 합"
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5';
+
+-- 2. AVG(숫자타입) : 해당 컬럼값의 평균값을 구해서 반환
+-- 전체 사원의 평균 급여 조회
+SELECT ROUND(AVG(SALARY))
+FROM EMPLOYEE;
+
+-- 3. MIN(여러 타입 : 해당 컬럼값들 중에 가장 작은 값 구해서 반환)
+SELECT MIN(EMP_NAME), MIN(SALARY), MIN(HIRE_DATE)
+FROM EMPLOYEE;
+
+-- 4. MAX(여러 타입 : 해당 컬럼 값들 중 가장 큰 값 구해서 반환)
+SELECT MAX(EMP_NAME), MAX(SALARY), MAX(HIRE_DATE)
+FROM EMPLOYEE;
+
+-- 5. COUNT(* | 컬럼 | DISTINCT 컬럼) : 조회된 행 개수를 새서 반환
+-- COUNT(*) : 조회된 결과의 모든 행 개수를 세서 반환
+-- COUNT(컬럼) : 제시한 해당 컬럼 값이 NULL이 아닌 것만 행 갯수 세서 반환
+-- COUNT(DISTINCT 컬럼) : 해당 컬럼 값 중복을 제거한 후 행 갯수 세서 반환
+
+-- 전체 사원 수
+SELECT COUNT(*)
+FROM EMPLOYEE; -- 모든 행 수를 출력
+
+-- 전체 여자 사원 수
+SELECT COUNT(*)
+FROM EMPLOYEE 
+WHERE SUBSTR(EMP_NO, '8','1') = '2';
+
+
+-- 보너스 받는 사원 수
+SELECT COUNT(BONUS) -- 컬럼이 NULL이 아닌 것만 카운팅한다
+FROM EMPLOYEE;
+
+-- SELECT * FROM EMPLOYEE
+-- WHERE BONUS IS NOT NULL;
+
+-- 부서배치를 받은 사원 수
+SELECT COUNT(DEPT_CODE)
+FROM EMPLOYEE;
+
+-- SELECT * FROM EMPLOYEE
+-- WHERE DEPT_CODE IS NOT NULL;
+
+-- DISTINCT
+SELECT COUNT(DISTINCT DEPT_CODE)
+FROM EMPLOYEE;
+
+
+SELECT DISTINCT DEPT_CODE FROM EMPLOYEE
+WHERE DEPT_CODE IS NOT NULL;
+
+
+
+
+
+
