@@ -44,7 +44,7 @@ SELECT SYSDATE FROM DUAL;
 
 --10. EMP테이블에서 사번, 사원명, 급여 조회
 -- (단, 급여는 100단위까지의 값만 출력 처리하고 급여 기준 내림차순 정렬)
-SELECT EMPNO, ENAME, CEIL(SAL)
+SELECT EMPNO, ENAME,CEIL(SAL/10)
 FROM EMP
 ORDER BY SAL DESC;
 
