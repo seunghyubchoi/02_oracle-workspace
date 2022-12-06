@@ -55,3 +55,35 @@ GROUP BY DEPT_CODE
 HAVING AVG(SALARY) > 2700000
 ORDER BY 1);
 
+-- '21/09/28'와 같은 문자열을 가지고 '2020-09-28'로 표현해보기
+-- TO_DATE('문자열', [포맷]) : DATE
+-- TO_CHAR(날짜, [포맷]) :CHARACTER
+SELECT TO_CHAR(TO_DATE('21/09/28'),'YYYY-MM-DD')FROM DUAL;
+-- '210908'와 같은 문자열을 가지고 2021년 9월 8일 표현(구글링 가능)
+SELECT TO_CHAR(TO_DATE('210908'),'YYYY"년" FMMM"월" DD"일"') FROM DUAL;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
