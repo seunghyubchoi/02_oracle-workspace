@@ -65,8 +65,12 @@ SELECT TO_CHAR(TO_DATE('210908'),'YYYY"년" FMMM"월" DD"일"') FROM DUAL;
 
 
 
-
-
+SELECT EMP_NAME, JOB_CODE, SALARY,
+    DECODE(JOB_CODE, 'J7', SALARY * 1.1,
+                'J6', SALARY * 1.15,
+                'J5', SALARY * 1.2,
+                SALARY * 1.05) AS "인상된 급여"
+FROM EMPLOYEE;
 
 
 
