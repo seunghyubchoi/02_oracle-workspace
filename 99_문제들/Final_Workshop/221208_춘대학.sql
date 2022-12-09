@@ -73,13 +73,8 @@ ALTER TABLE TB_CLASS_TYPE
 ALTER TABLE TB_CATEGORY
     RENAME COLUMN NAME TO CATEGORY_NAME;
     
-    
-    
-
 ALTER TABLE TB_CATEGORY
     RENAME COLUMN USE_YN TO CATEGORY_USE_YN;    
-    
-
 /*
 
 7. TB_CATAGORY 테이블과 TB_CLASS_TYPE 
@@ -94,7 +89,7 @@ ALTER TABLE TB_CATEGORY
     RENAME CONSTRAINT NAME_PK TO PK_CATEGORY_NAME;
     
 ALTER TABLE TB_CLASS_TYPE
-    RENAME CONSTRAINT SYS_C007230 TO PK_CLASS_TYPE_NO;
+    RENAME CONSTRAINT SYS_C007121 TO PK_CLASS_TYPE_NO;
     
 /*
 
@@ -122,118 +117,13 @@ FK_테이블이름_컬럼이름으로 지정핚다. (ex. FK_DEPARTMENT_CATEGORY )
 
 */
 
-ALTER TABLE TB_DEPARTMENT(
-    CATEGORY VARCHAR2(20) CONSTRAINT FK_DEPARTMENT_CATEGORY REFERENCES TB_CATEGORY(CATEGORY_NAME)
-);
-
-/*
-
-10. 춘 기술대학교 학생들의 정보맊이 포함되어 있는 학생일반정보 VIEW 를 맊들고자 핚다.
-아래 내용을 참고하여 적젃핚 SQL 문을 작성하시오.
-
-뷰 이름
-    VW_학생일반정보
-컬럼
-    학번  
-    학생이름
-    주소
-*/
-
-CREATE VIEW 'VW_학생일반정보'
-AS (
-SELECT
-STUDENT_NO NUMBER,
-STDUETN_NAME VARCHAR2(20),
-ADDRESS VARCHAR2(30)
-FROM 
-);
-
-/*
-
---15. 춘 기술대학교는 매년 수강신청 기간만 되면 특정 인기 과목들에 수강 신청이 몰려
---문제가 되고 있다. (2005~2009) 기준으로 수강인원이 가장 많았던 3 과목을 찾는 구문을
---작성해보시오.
+SELECT * FROM TB_DEPARTMENT;
 
 
-*/
-
-
--- DML
-
-
--- 1. 과목유형 테이블(TB_CLASS_TYPE)에 아래와 같은 데이터를 입력하시오.
-INSERT INTO TB_CLASS_TYPE
-VALUES(01, '전공필수');
-
-INSERT INTO TB_CLASS_TYPE 
-VALUES(02, '전공선택');
-
-INSERT INTO TB_CLASS_TYPE 
-VALUES(03, '교양필수');
-
-INSERT INTO TB_CLASS_TYPE 
-VALUES(04, '교양선택');
-
-INSERT INTO TB_CLASS_TYPE 
-VALUES(05, '논문지도');
-
--- 2. 춘 기술대학교 학생들의 정보가 포함되어 있는 
--- 학생일반정보 테이블을 맊들고자 핚다.
--- 아래 내용을 참고하여 적젃핚 SQL 문을 작성하시오. (서브쿼리를 이용하시오)
-
-CREATE TABLE TB_학생일반정보
-    
-    STUDENT_NO 
-    STUDENT_NAME 
-    STUDENT_ADDRESS 
-
-
-SELECT * FROM TB_학생일반정보;
-
-DROP TABLE TB_학생일반정보;
-
-SELECT STUDENT_NO, STUDENT_NAME, STUDENT_ADDRESS FROM TB_STUDENT;
-
-INSERT INTO TB_학생일반정보(
-SELECT STUDENT_NO, STUDENT_NAME, STUDENT_ADDRESS FROM TB_STUDENT
-);
-
-/*
-
-3. 국어국문학과 학생들의 정보맊이 포함되어 있는 학과정보 테이블을 맊들고자 핚다.
-아래 내용을 참고하여 적젃핚 SQL 문을 작성하시오. (힌트 : 방법은 다양함, 소신껏
-작성하시오)
-
-*/
-
-SELECT STUDENT_NO, STUDENT_NAME, CONCAT('19',SUBSTR(STUDENT_SSN, 1, 2), PROFESSOR_NAME
-FROM TB_STUDENT
-JOIN TB_DEPARTMENT USING (DEPARTMENT_NO)
-JOIN TB_PROFESSOR USING (DEPARTMENT_NO)
-WHERE DEPARTMENT_NAME = '국어국문학과';
-
-
-CREATE TABLE TB_국어국문학과(
-    STUDENT_NO VARCHAR2(10),
-    STUDENT_NAME VARCHAR2(40),
-    STUDENT_BDAY VARCHAR2(10),
-    PROFESSOR_NAME VARCHAR2(40));
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+ALTER TABLE TB_DEPARTMENT
+    ADD CONSTRAINT FK_DEPARTMENT_CATEGORY 
+    FOREIGN KEY(CATEGORY)  
+    REFERENCES TB_CATEGORY(CATEGORY_NAME);
     
     
 /*    
@@ -324,8 +214,8 @@ FROM TB_STUDENT
 WITH READ ONLY;
 
 /*
-15. 춘 기술대학교는 매년 수강신청 기갂맊 되면 특정 인기 과목들에 수강 신청이 몰려
-문제가 되고 있다. 최근 3 년을 기준으로 수강인원이 가장 맋았던 3 과목을 찾는 구문을
+15. 춘 기술대학교는 매년 수강신청 기간만 되면 특정 인기 과목들에 수강 신청이 몰려
+문제가 되고 있다. (2005~2009) 기준으로 수강인원이 가장 많았던 3 과목을 찾는 구문을
 작성해보시오.
 과목번호 과목이름 누적수강생수(명)
 ---------- ------------------------------ ----------------
@@ -333,8 +223,160 @@ C1753800 서어방언학 29
 C1753400 서어문체롞 23
 C2454000 원예작물번식학특롞 22
 */    
+
+SELECT CLASS_NO, CLASS_NAME ,COUNT(STUDENT_NO)
+FROM TB_CLASS
+JOIN TB_STUDENT USING (DEPARTMENT_NO)
+GROUP BY CLASS_NO, CLASS_NAME;    
+
+SELECT 과목번호, 과목이름, 누적수강생수
+FROM (
+SELECT CLASS_NO 과목번호, CLASS_NAME 과목이름, COUNT(STUDENT_NAME) 누적수강생수
+FROM TB_GRADE
+JOIN TB_CLASS USING(CLASS_NO)
+JOIN TB_STUDENT USING(STUDENT_NO)
+GROUP BY CLASS_NO, EXTRACT(YEAR FROM (TO_DATE(TERM_NO,'YYYYMM'))), CLASS_NAME
+HAVING EXTRACT(YEAR FROM (TO_DATE(TERM_NO,'YYYYMM'))) IN( 2005, 2006, 2007, 2008, 2009)
+ORDER BY 3 DESC)
+WHERE ROWNUM <= 3;
+
+SELECT "과목번호", "과목이름", "수강생수"
+FROM (  SELECT ROWNUM, "과목번호", "과목이름", "수강생수"
+FROM (
+        SELECT C.CLASS_NO "과목번호", C.CLASS_NAME "과목이름", COUNT(*) "수강생수"
+        FROM TB_CLASS C
+        LEFT JOIN TB_GRADE G ON (C.CLASS_NO = G.CLASS_NO)
+        WHERE SUBSTR(G.TERM_NO, 1,4) IN (2009, 2008, 2007)
+        GROUP BY C.CLASS_NO, C.CLASS_NAME
+        ORDER BY COUNT(*) DESC)
+WHERE ROWNUM <= 3);
+
+
+SELECT CLASS_NO, CLASS_NAME, COUNT(STUDENT_NAME)
+FROM TB_GRADE
+JOIN TB_CLASS USING(CLASS_NO)
+JOIN TB_STUDENT USING(STUDENT_NO)
+GROUP BY CLASS_NO, EXTRACT(YEAR FROM (TO_DATE(TERM_NO,'YYYYMM'))), CLASS_NAME
+HAVING EXTRACT(YEAR FROM (TO_DATE(TERM_NO,'YYYYMM'))) BETWEEN 2005 AND 2009;
+
+
+
+-- DML
+
+
+-- 1. 과목유형 테이블(TB_CLASS_TYPE)에 아래와 같은 데이터를 입력하시오.
+INSERT INTO TB_CLASS_TYPE
+VALUES(01, '전공필수');
+
+INSERT INTO TB_CLASS_TYPE 
+VALUES(02, '전공선택');
+
+INSERT INTO TB_CLASS_TYPE 
+VALUES(03, '교양필수');
+
+INSERT INTO TB_CLASS_TYPE 
+VALUES(04, '교양선택');
+
+INSERT INTO TB_CLASS_TYPE 
+VALUES(05, '논문지도');
+
+-- 2. 춘 기술대학교 학생들의 정보가 포함되어 있는 
+-- 학생일반정보 테이블을 맊들고자 핚다.
+-- 아래 내용을 참고하여 적젃핚 SQL 문을 작성하시오. (서브쿼리를 이용하시오)
+
+CREATE TABLE TB_학생일반정보
     
-    
+    STUDENT_NO 
+    STUDENT_NAME 
+    STUDENT_ADDRESS 
+
+
+SELECT * FROM TB_학생일반정보;
+
+DROP TABLE TB_학생일반정보;
+
+SELECT STUDENT_NO, STUDENT_NAME, STUDENT_ADDRESS FROM TB_STUDENT;
+
+INSERT INTO TB_학생일반정보(
+SELECT STUDENT_NO, STUDENT_NAME, STUDENT_ADDRESS FROM TB_STUDENT
+);
+
+/*
+
+3. 국어국문학과 학생들의 정보맊이 포함되어 있는 학과정보 테이블을 맊들고자 핚다.
+아래 내용을 참고하여 적젃핚 SQL 문을 작성하시오. (힌트 : 방법은 다양함, 소신껏
+작성하시오)
+
+*/
+
+CREATE TABLE TB_국어국문학과
+AS 
+SELECT STUDENT_NO 학번, STUDENT_NAME 학생이름, 
+CONCAT('19',SUBSTR(STUDENT_SSN, 1,2)) 출생년도, PROFESSOR_NAME 교수이름
+FROM TB_STUDENT
+JOIN TB_DEPARTMENT USING (DEPARTMENT_NO)
+LEFT JOIN TB_PROFESSOR ON (PROFESSOR_NO = COACH_PROFESSOR_NO)
+WHERE DEPARTMENT_NAME = '국어국문학과';
+
+
+
+--4. 현 학과들의 정원을 10% 증가시키게 되었다. 
+--이에 사용핛 SQL 문을 작성하시오. (단,
+--반올림을 사용하여 소수점 자릿수는 생기지 않도록 핚다)
+
+UPDATE TB_DEPARTMENT
+SET CAPACITY = ROUND(CAPACITY * 1.1, 0);
+
+
+--5. 학번 A413042 인 박건우 학생의 주소가 
+--"서울시 종로구 숭인동 181-21 "로 변경되었다고핚다. 
+--주소지를 정정하기 위해 사용핛 SQL 문을 작성하시오.
+UPDATE TB_STUDENT
+SET STUDENT_ADDRESS = '서울시 종로구 숭인동 181-21'
+WHERE STUDENT_NO = 'A413042';
+
+
+--6. 주민등록번호 보호법에 따라 
+--학생정보 테이블에서 주민번호 뒷자리를 저장하지 않기로
+--결정하였다. 이 내용을 반영핛 적젃핚 SQL 문장을 작성하시오.
+--(예. 830530-2124663 ==> 830530 )
+UPDATE TB_STUDENT
+SET STUDENT_SSN = SUBSTR(STUDENT_SSN,1,6);
+
+
+--7. 의학과 김명훈 학생은 
+--2005 년 1 학기에 자신이 수강핚 '피부생리학' 점수가
+--잘못되었다는 것을 발견하고는 정정을 요청하였다. 
+--담당 교수의 확인 받은 결과 해당 과목의 
+--학점을 3.5 로 변경키로 결정되었다. 적젃핚 SQL 문을 작성하시오.
+
+UPDATE TB_GRADE 
+-- TERM_NO, STUDENT_NO, CLASS_NO, POINT 중 
+-- JOIN 가능한 다른 테이블과 연관된 요소로 WHERE 잡기
+SET POINT = 3.5 -- 1.5
+WHERE (TERM_NO, STUDENT_NO) =
+(
+SELECT TERM_NO, STUDENT_NO
+FROM TB_STUDENT
+JOIN TB_DEPARTMENT USING(DEPARTMENT_NO)
+JOIN TB_GRADE G USING(STUDENT_NO)
+JOIN TB_CLASS C ON(C.CLASS_NO = G.CLASS_NO)
+WHERE STUDENT_NAME = '김명훈'
+AND DEPARTMENT_NAME = '의학과'
+AND TERM_NO = 200501
+);
+ROLLBACK;
+
+--8. 성적 테이블(TB_GRADE) 에서 휴학생들의 성적항목을 제거하시오.
+
+DELETE FROM TB_GRADE G
+WHERE POINT IN (
+                SELECT POINT
+                FROM TB_STUDENT S
+                WHERE S.STUDENT_NO = G.STUDENT_NO
+                AND ABSENCE_YN = 'Y'          
+);
+ROLLBACK;  
     
     
     
