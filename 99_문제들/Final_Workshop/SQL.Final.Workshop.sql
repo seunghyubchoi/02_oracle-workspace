@@ -25,12 +25,13 @@ WHERE COMPOSE_TYPE = '옮김';
 
 -- 6. 300권 이상 등록된 도서의 저작 형태 및 등록된 도서 수량을 표시하는 SQL 구문을 작성하시오.
 -- (저작형태가 등록되지 않은 경우는 제외할 것)
-SELECT * FROM TB_BOOK;
-SELECT * FROM TB_WRITER;
-SELECT * FROM TB_PUBLISHER;
+
 SELECT * FROM TB_BOOK_AUTHOR;
 
-
+SELECT COMPOSE_TYPE,COUNT(COMPOSE_TYPE)
+FROM TB_BOOK_AUTHOR
+GROUP BY COMPOSE_TYPE
+HAVING COUNT(COMPOSE_TYPE) >= 300;
 
 
 -- 7. 가장 최근에 발간된 최신작 이름과 발행일자, 출판사 이름을 표시하는 SQL 구문을 작성하시오.
@@ -50,28 +51,53 @@ ORDER BY 2 DESC;
 -- 9. 작가 정보 테이블의 모든 등록일자 항목이 누락되어 있는 걸 발견하였다. 
 -- 누락된 등록일자 값을 각 작가의 ‘최초 출판도서의 발행일과 동일한 날짜’로 
 -- 변경시키는 SQL 구문을 작성하시오. (COMMIT 처리할 것)
+
 SELECT * FROM TB_WRITER;
 SELECT * FROM TB_BOOK;
 SELECT * FROM TB_BOOK_AUTHOR;
 
+-- 각 작가별 책의 REGIST_DATE 확인을 위해
+-- TB_WRITER의 WRITER_NO
+-- TB_BOOK의 BOOK_NO
+-- TB_BOOK_AUTHOR의 BOOK_NO, WRITER_NO
+SELECT REGIST_DATE, ISSUE_DATE 
+FROM TB_WRITER
+JOIN TB_BOOK_AUTHOR USING(WRITER_NO)
+JOIN TB_BOOK USING(BOOK_NO);
 
-SELECT ISSUE_DATE, 
-FROM TB_BOOK
-JOIN TB_WRITER ;
-
-
-UPDATE TB_WRITER
+UPDATE TB_WRITER W
 SET REGIST_DATE =
     (
-    SELECT ISSUE_DATE FROM TB_BOOK_
-    
+    SELECT MIN(ISSUE_DATE) 
+    FROM TB_WRITER
+    JOIN TB_BOOK_AUTHOR USING(WRITER_NO)
+    JOIN TB_BOOK USING(BOOK_NO)
+    WHERE WRITER_NO = W.WRITER_NO
     );
+    
+SELECT * FROM TB_BOOK_AUTHOR;
 
--- 10. 현재 도서저자 정보 테이블은 저서와 번역서를 구분 없이 관리하고 있다. 앞으로는 번역서는 따로 관리하려
--- 고 한다. 제시된 내용에 맞게 “TB_BOOK_ TRANSLATOR” 테이블을 생성하는 SQL 구문을 작성하시오. 
+
+SELECT * FROM TB_BOOK
+WHERE BOOK_NO IN (2001092003, 2001092002, 2001092001); -- ISSUE_DATE 비교하기 좋은 구문
+
+
+-- 10. 현재 도서저자 정보 테이블은 저서와 번역서를 구분 없이 관리하고 있다. 
+-- 앞으로는 번역서는 따로 관리하려고 한다. 
+-- 제시된 내용에 맞게 “TB_BOOK_ TRANSLATOR” 테이블을 생성하는 SQL 구문을 작성하시오. 
 -- (Primary Key 제약 조건 이름은 “PK_BOOK_TRANSLATOR”로 하고, Reference 제약 조건 이름은
 -- “FK_BOOK_TRANSLATOR_01”, “FK_BOOK_TRANSLATOR_02”로 할 것)
+SELECT * FROM TB_BOOK_AUTHOR;
+SELECT * FROM TB_WRITER;
 
+CREATE TABLE TB_BOOK_TRANSLATOR(
+    BOOK_NO VARCHAR2(10) CONSTRAINT PK_BOOK_TRANSLATOR PRIMARY KEY,
+    WRITER_NO VARCHAR2(10) CONSTRAINT FK_BOOK_TRANSLATOR_01 REFERENCES TB_WRITER(WRITER_NO) NOT NULL,
+    COMPOSE_TYPE VARCHAR2(20),
+    FOREIGN KEY(BOOK_NO) REFERENCES TB_BOOK
+);
+
+DROP TABLE TB_BOOK_TRANSLATOR;
 
 -- 11. 도서 저작 형태(compose_type)가 '옮김', '역주', '편역', '공역'에 해당하는 데이터는
 -- 도서 저자 정보 테이블에서 도서 역자 정보 테이블(TB_BOOK_ TRANSLATOR)로 옮기는 SQL 

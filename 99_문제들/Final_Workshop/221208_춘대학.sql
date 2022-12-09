@@ -122,7 +122,7 @@ FK_테이블이름_컬럼이름으로 지정핚다. (ex. FK_DEPARTMENT_CATEGORY )
 
 */
 
-CREATE TABLE TB_DEPARTMENT(
+ALTER TABLE TB_DEPARTMENT(
     CATEGORY VARCHAR2(20) CONSTRAINT FK_DEPARTMENT_CATEGORY REFERENCES TB_CATEGORY(CATEGORY_NAME)
 );
 
@@ -181,12 +181,12 @@ VALUES(05, '논문지도');
 -- 학생일반정보 테이블을 맊들고자 핚다.
 -- 아래 내용을 참고하여 적젃핚 SQL 문을 작성하시오. (서브쿼리를 이용하시오)
 
-CREATE TABLE TB_학생일반정보(
+CREATE TABLE TB_학생일반정보
     
-    STUDENT_NO VARCHAR2(10),
-    STUDENT_NAME VARCHAR2(40),
-    STUDENT_ADDRESS VARCHAR2(200)
-);
+    STUDENT_NO 
+    STUDENT_NAME 
+    STUDENT_ADDRESS 
+
 
 SELECT * FROM TB_학생일반정보;
 
@@ -217,5 +217,146 @@ CREATE TABLE TB_국어국문학과(
     STUDENT_NO VARCHAR2(10),
     STUDENT_NAME VARCHAR2(40),
     STUDENT_BDAY VARCHAR2(10),
-    PROFESSOR_NAME VARCHAR2(40)
+    PROFESSOR_NAME VARCHAR2(40));
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+/*    
+10. 춘 기술대학교 학생들의 정보맊이 포함되어 있는 학생일반정보 VIEW 를 맊들고자 핚다.
+아래 내용을 참고하여 적젃핚 SQL 문을 작성하시오.
+
+뷰 이름
+VW_학생일반정보
+컬럼
+학번
+학생이름
+주소
+*/
+
+CREATE OR REPLACE VIEW VW_학생일반정보
+AS SELECT STUDENT_NO, STUDENT_NAME, STUDENT_ADDRESS
+FROM TB_STUDENT;
+
+
+/*
+11. 춘 기술대학교는 1 년에 두 번씩 학과별로 학생과 지도교수가 지도 면담을 진행핚다.
+이를 위해 사용핛 학생이름, 학과이름, 담당교수이름 으로 구성되어 있는 VIEW 를 맊드시오.
+이때 지도 교수가 없는 학생이 있을 수 있음을 고려하시오 (단, 이 VIEW 는 단순 SELECT
+맊을 핛 경우 학과별로 정렬되어 화면에 보여지게 맊드시오.)
+뷰 이름
+VW_지도면담
+컬럼
+학생이름
+학과이름
+지도교수이름
+*/
+
+CREATE OR REPLACE VIEW VW_지도면담
+AS SELECT STUDENT_NAME, DEPARTMENT_NAME, PROFESSOR_NAME
+   FROM TB_STUDENT
+   JOIN TB_DEPARTMENT USING (DEPARTMENT_NO)
+   LEFT JOIN TB_PROFESSOR ON (COACH_PROFESSOR_NO = PROFESSOR_NO)
+   ORDER BY 2;
+   
+
+SELECT * FROM VW_지도면담;
+
+
+/*
+12. 모든 학과의 학과별 학생 수를 확인핛 수 있도록 적젃핚 VIEW 를 작성해 보자.
+뷰 이름
+VW_학과별학생수
+컬럼
+DEPARTMENT_NAME
+STUDENT_COUNT
+
+25
+*/
+
+
+
+CREATE OR REPLACE VIEW VW_학과별학생수
+AS SELECT DEPARTMENT_NAME, COUNT(STUDENT_NAME) AS "STUDENT_COUNT"
+FROM TB_DEPARTMENT
+JOIN TB_STUDENT USING (DEPARTMENT_NO)
+GROUP BY DEPARTMENT_NAME;
+
+SELECT * FROM VW_학과별학생수;
+
+
+/*
+13. 위에서 생성핚 학생일반정보 View 를 통해서 학번이 A213046 인 학생의 이름을 본인
+이름으로 변경하는 SQL 문을 작성하시오.
+*/
+
+UPDATE VW_학생일반정보
+SET STUDENT_NAME = '최승협'
+WHERE STUDENT_NO = 'A213046';
+
+SELECT STUDENT_NAME FROM VW_학생일반정보
+WHERE STUDENT_NO = 'A213046';
+
+
+/*
+14. 13 번에서와 같이 VIEW 를 통해서 데이터가 변경될 수 있는 상황을 막으려면 VIEW 를
+어떻게 생성해야 하는지 작성하시오.
+*/
+
+-- 뷰 생성시 WITH READ ONLY를 덧붙힌다
+CREATE OR REPLACE VIEW VW_학생일반정보
+AS SELECT STUDENT_NO, STUDENT_NAME, STUDENT_ADDRESS
+FROM TB_STUDENT
+WITH READ ONLY;
+
+/*
+15. 춘 기술대학교는 매년 수강신청 기갂맊 되면 특정 인기 과목들에 수강 신청이 몰려
+문제가 되고 있다. 최근 3 년을 기준으로 수강인원이 가장 맋았던 3 과목을 찾는 구문을
+작성해보시오.
+과목번호 과목이름 누적수강생수(명)
+---------- ------------------------------ ----------------
+C1753800 서어방언학 29
+C1753400 서어문체롞 23
+C2454000 원예작물번식학특롞 22
+*/    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 );
