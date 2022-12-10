@@ -210,7 +210,9 @@ WHERE COMPOSE_TYPE IS NULL;
 
 
 SELECT COMPOSE_TYPE
-FROM TB_BOOK_AUTHOR;
+FROM TB_BOOK_TRANSLATOR;
+
+COMMIT;
 
 -- 17. 서울지역 작가 모임을 개최하려고 한다. 
 -- 사무실이 서울이고, 사무실 전화 번호 국번이 3자리인 작가의
@@ -222,9 +224,10 @@ WHERE OFFICE_TELNO LIKE '02-___-____';
 -- 18. 2006년 1월 기준으로 등록된 지 31년 이상 된 
 -- 작가 이름을 이름순으로 표시하는 SQL 구문을 작성하시오.
 
-SELECT WRITER_NM, REGIST_DATE
+SELECT WRITER_NM
 FROM TB_WRITER
-WHERE TRUNC(MONTHS_BETWEEN('200601', REGIST_DATE ) / 12 ) >= 31; 
+WHERE TRUNC(MONTHS_BETWEEN('20060101', REGIST_DATE ) / 12 ) >= 31
+ORDER BY 1; 
 
 
 -- 19. 요즘 들어 다시금 인기를 얻고 있는 '황금가지' 출판사를 위한 기획전을 열려고 한다. 
