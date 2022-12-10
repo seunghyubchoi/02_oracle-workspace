@@ -10,18 +10,27 @@ WHERE LENGTH(BOOK_NM) >= 25;
 SELECT * FROM TB_WRITER;
 
 SELECT WRITER_NM, OFFICE_TELNO, HOME_TELNO, MOBILE_NO
+FROM 
+(SELECT WRITER_NM, OFFICE_TELNO, HOME_TELNO, MOBILE_NO 
 FROM TB_WRITER
 WHERE MOBILE_NO LIKE '019%'
-ORDER BY 1;
+AND WRITER_NM LIKE '김%'
+ORDER BY 1)
+WHERE ROWNUM <= 1;
 
--- 5. 저작 형태가 “옮김”에 해당하는 작가들이 총 몇 명인지 계산하는 SQL 구문을 작성하시오. (결과 헤더는
--- “작가(명)”으로 표시되도록 할 것)
+
+
+-- 5. 저작 형태가 “옮김”에 해당하는 
+-- 작가들이 총 몇 명인지 계산하는 SQL 구문을 작성하시오. 
+--(결과 헤더는 “작가(명)”으로 표시되도록 할 것)
 SELECT * FROM TB_BOOK_AUTHOR;
 
-SELECT WRITER_NM AS "작가(명)"
+SELECT  COUNT(WRITER_NM) AS "작가(명)"
+FROM (SELECT WRITER_NM
 FROM TB_WRITER
 JOIN TB_BOOK_AUTHOR USING(WRITER_NO)
-WHERE COMPOSE_TYPE = '옮김';
+WHERE COMPOSE_TYPE = '옮김'
+GROUP BY WRITER_NM);
 
 -- 6. 300권 이상 등록된 도서의 저작 형태 및 등록된 도서 수량을 표시하는 SQL 구문을 작성하시오.
 -- (저작형태가 등록되지 않은 경우는 제외할 것)
@@ -51,10 +60,6 @@ ORDER BY 2 DESC;
 -- 9. 작가 정보 테이블의 모든 등록일자 항목이 누락되어 있는 걸 발견하였다. 
 -- 누락된 등록일자 값을 각 작가의 ‘최초 출판도서의 발행일과 동일한 날짜’로 
 -- 변경시키는 SQL 구문을 작성하시오. (COMMIT 처리할 것)
-
-SELECT * FROM TB_WRITER;
-SELECT * FROM TB_BOOK;
-SELECT * FROM TB_BOOK_AUTHOR;
 
 -- 각 작가별 책의 REGIST_DATE 확인을 위해
 -- TB_WRITER의 WRITER_NO
