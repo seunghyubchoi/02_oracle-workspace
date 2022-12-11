@@ -282,10 +282,11 @@ VALUES(05, '논문지도');
 -- 아래 내용을 참고하여 적젃핚 SQL 문을 작성하시오. (서브쿼리를 이용하시오)
 
 CREATE TABLE TB_학생일반정보
-    
-    STUDENT_NO 
-    STUDENT_NAME 
-    STUDENT_ADDRESS 
+AS SELECT
+    STUDENT_NO, 
+    STUDENT_NAME, 
+    STUDENT_ADDRESS
+FROM TB_STUDENT;
 
 
 SELECT * FROM TB_학생일반정보;
