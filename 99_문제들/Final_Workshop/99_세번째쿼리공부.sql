@@ -39,3 +39,37 @@ JOIN TB_JOB ON (JOBCODE=JOBNO);
 -- 제약조건 => 뒤늦게 제약조건을 추가할 수 있는 ALTER 문 작성
 -- DCL? = GRANT, REVOKE
 -- COMMIT? ROLLBACK?
+
+-- QUIZ3 (JOIN 복습)
+
+-- 아래의 SQL 구문은 부서별 월급합계가 15,000,000을 초과하는 부서를 조회한 것이다
+-- 그 결과가 올바르지 않다고 할 때 그 원인과 조치사항
+SELECT DEPT_CODE, SUM(SALARY)
+FROM EMPLOYEE
+WHERE SALARY > 15000000
+GROUP BY DEPT_CODE;
+
+SELECT DEPT_CODE, SUM(SALARY) -- SUM 나오면 HAVING을 써보세요
+FROM EMPLOYEE
+GROUP BY DEPT_CODE
+HAVING SUM(SALARY) > 15000000;
+
+-- QUIZ4 제약조건
+CREATE TABLE QUIZ4(
+    QNO NUMBER PRIMARY KEY,
+    QNAME VARCHAR2(10),
+    SCORE NUMBER
+);
+
+INSERT INTO QUIZ4 VALUES(1, '퀴즈1번', 30);
+INSERT INTO QUIZ4 VALUES(1, '퀴즈2번', 35); -- 안 되는 이유? = QNO가 PRIMARY KEY로 설정되어 있기 때문 
+
+-- JOIN => DECODE
+-- J7인 사원은 급여를 10% 인상
+-- J6인 사원은 급여를 15% 인상
+
+--'21/09/28' 문자열을 '2021-09-28'로 바꾸는 방법
+--'210908'을 2021년 9월 8일로 바꾸는 방법
+
+-- 초급개발자, 중급개발자, 고급개발자
+-- CASE WHEN 
