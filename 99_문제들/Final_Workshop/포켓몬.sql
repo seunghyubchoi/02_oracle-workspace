@@ -34,7 +34,10 @@ INSERT INTO POKEMON VALUES(95, '롱스톤', '바위', '돌뱀포켓몬', 8.8, 210.0, '몸을
 INSERT INTO POKEMON VALUES(54, '고라파덕', '물', '오리포켓몬', 0.8, 19.6, '이상한 힘을 간직하고 있지만 사용했던 기억이 없으므로 항상 고개를 갸웃거리고 있다.', 3);
 
 
-
 INSERT INTO TRAINER VALUES(1, 'user01', 'pass01', '한지우');
 INSERT INTO TRAINER VALUES(2, 'user02', 'pass02', '웅');
 INSERT INTO TRAINER VALUES(3, 'user03', 'pass03', '이슬');
+INSERT INTO TRAINER VALUES(0, 'admin', 'admin', '관리자');
+
+
+SELECT * FROM POKEMON JOIN TRAINER USING(TRNO) WHERE TRID = 'user01';
