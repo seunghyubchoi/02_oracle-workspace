@@ -27,6 +27,8 @@ NOCACHE;
 
 
 
+
+
 SELECT DISTINCT PKTYPE FROM POKEMON;
 
 INSERT INTO POKEMON VALUES(25, '피카츄', '전기', '쥐포켓몬', 0.4, 6.0, '숲속에서 동료와 산다. 볼의 양쪽에 있는 전기 주머니에 전기를 모아 둔다.', 1);
@@ -40,4 +42,6 @@ INSERT INTO TRAINER VALUES(3, 'user03', 'pass03', '이슬');
 INSERT INTO TRAINER VALUES(0, 'admin', 'admin', '관리자');
 
 
-SELECT * FROM POKEMON JOIN TRAINER USING(TRNO) WHERE TRID = 'user01';
+SELECT * FROM POKEMON p, TRAINER t WHERE p.TRNO = t.TRNO AND t.TRID = 'user01';
+
+commit;
