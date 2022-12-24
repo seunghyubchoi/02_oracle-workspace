@@ -42,6 +42,16 @@ INSERT INTO TRAINER VALUES(3, 'user03', 'pass03', '이슬');
 INSERT INTO TRAINER VALUES(0, 'admin', 'admin', '관리자');
 
 
-SELECT * FROM POKEMON p, TRAINER t WHERE p.TRNO = t.TRNO AND t.TRID = 'user01';
+SELECT  PKNO
+			  , p.PKNAME
+			  , p.PKTYPE
+			  , p.PKCLASS
+			  , p.PKHEIGHT
+			  , p.PKWEIGHT
+			  , p.PKDETAIL
+			  , t.TRNO 
+FROM POKEMON p, TRAINER t 
+WHERE p.TRNO = t.TRNO 
+AND t.TRID = 'user01';
 
 commit;
